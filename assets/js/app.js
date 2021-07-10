@@ -64,11 +64,19 @@ d3.csv("assets/data/data.csv").then(function(data){
     var circlesGroup = chartGroup.selectAll("circle")
     .data(data)
     .enter()
-    .append("circle")
-    .attr("cx", d => xLinearScale(d.poverty))
-    .attr("cy", d => yLinearScale(d.healthcare))
-    .attr("r", "10")
-    .classed('stateCircle', true)
+    .append("g");
+
+        var circles = circlesGroup.append("circle")
+                    .attr("cx", d => xLinearScale(d.poverty))
+                    .attr("cy", d => yLinearScale(d.healthcare))
+                    .attr("r", "10")
+                    .classed('stateCircle', true);
+
+        circlesGroup.append("text")
+                    .text(d => d.abbr)
+                    .attr("cx", d => xLinearScale(d.poverty))
+                    .attr("cy", d => yLinearScale(d.healthcare)+5)
+                    .classed('stateText', true);
     
   });
 

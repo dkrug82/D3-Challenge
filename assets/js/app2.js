@@ -12,6 +12,7 @@ var margin = {
 var width = svgWidth - margin.left - margin.right;
 var height = svgHeight - margin.top - margin.bottom;
 
+//Created SVG wrapper
 var svg = d3
     .select("#scatter")
     .append("svg")
@@ -71,8 +72,7 @@ function renderYAxes(newYScale, yAxis) {
     return yAxis;
 }
 
-// functions used for updating X axis -- Try someting similar for Y axis
-
+// functions used for updating X axis
 function renderXCircles(circlesGroup, newXScale, chosenXAxis) {
 
     circlesGroup.transition()
@@ -81,7 +81,6 @@ function renderXCircles(circlesGroup, newXScale, chosenXAxis) {
 
     return circlesGroup;
 }
-
 
 // functions used for updating Y axis
 function renderYCircles(circlesGroup, newYScale, chosenYAxis) {
@@ -93,25 +92,27 @@ function renderYCircles(circlesGroup, newYScale, chosenYAxis) {
     return circlesGroup;
 }
 
-function renderXText (circlesText, newXScale, chosenXAxis) {
+// function used to update circle labels on x-axis
+function renderXText(circlesText, newXScale, chosenXAxis) {
 
     circlesText.transition()
         .duration(1000)
         .attr("x", d => newXScale(d[chosenXAxis]));
 
-        return circlesText;
+    return circlesText;
 }
 
-function renderYText (circlesText, newYScale, chosenYAxis) {
+// function used to update circle labels on y-axis
+function renderYText(circlesText, newYScale, chosenYAxis) {
 
     circlesText.transition()
         .duration(1000)
         .attr("y", d => newYScale(d[chosenYAxis]) + 5);
 
-        return circlesText;
+    return circlesText;
 }
 
-// function used for updating circles group 
+// function used for updating circles group with tooltip
 function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
     var xlabel;
     var ylabel;
@@ -122,7 +123,7 @@ function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
     else if (chosenXAxis === "age") {
         xlabel = "Age : ";
     }
-    else  {
+    else {
         xlabel = "Income : ";
     }
     if (chosenYAxis === 'healthcare') {
@@ -144,10 +145,11 @@ function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
 
     circlesGroup.call(toolTip);
 
-    circlesGroup.on("mouseover", function(data) {
+    // mouse over event
+    circlesGroup.on("mouseover", function (data) {
         toolTip.show(data);
-      })
-        // onmouseout event
+    })
+        // mouse out event
         .on("mouseout", function (data, index) {
             toolTip.hide(data);
         });
@@ -158,7 +160,7 @@ function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
 // Read the CSV data
 d3.csv("assets/data/data.csv").then(function (data, err) {
     if (err) throw err;
-    
+
     // parse data
     data.forEach(d => {
         // convert to numbers 
@@ -180,12 +182,12 @@ d3.csv("assets/data/data.csv").then(function (data, err) {
     var bottomAxis = d3.axisBottom(xLinearScale);
     var leftAxis = d3.axisLeft(yLinearScale);
 
-    // append x axis
+    // append x-axis
     var xAxis = chartGroup.append("g")
         .attr("transform", `translate(0, ${height})`)
         .call(bottomAxis);
 
-    // append y axis
+    // append y-axis
     var yAxis = chartGroup.append("g")
         .call(leftAxis);
 
@@ -201,20 +203,13 @@ d3.csv("assets/data/data.csv").then(function (data, err) {
 
     // append text inside circles
     var circlesText = chartGroup.selectAll(".stateText")
-    .data(data)
-    .enter()
-    .append("text")
-    .text(d => d.abbr)
-    .attr("x", d => xLinearScale(d[chosenXAxis])) 
-    .attr("y", d => yLinearScale(d[chosenYAxis]) + 5) 
-    .classed("stateText", true);
-    
-    // circlesGroup.append("text")
-        
-    //     .attr("cx", d => xLinearScale(d[chosenXAxis]))
-    //     .attr("cy", d => yLinearScale(d[chosenYAxis]) + 5) //to center the text in the circles
-    //     .classed('stateText', true)
-    //     .text(d => d.abbr);
+        .data(data)
+        .enter()
+        .append("text")
+        .text(d => d.abbr)
+        .attr("x", d => xLinearScale(d[chosenXAxis]))
+        .attr("y", d => yLinearScale(d[chosenYAxis]) + 5)
+        .classed("stateText", true);
 
     // Create group for three x-axis labels
     var xlabelsGroup = chartGroup.append("g")
@@ -240,10 +235,6 @@ d3.csv("assets/data/data.csv").then(function (data, err) {
         .attr("value", "income") // value to grab for event listener
         .classed("active", true)
         .text("Household Income (Median)");
-
-    // updateToolTip function above csv import
-    // circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
-
 
     // Create group for three y-axis labels
     var ylabelsGroup = chartGroup.append("g")
@@ -283,9 +274,8 @@ d3.csv("assets/data/data.csv").then(function (data, err) {
                 // replaces chosenXAxis with value
                 chosenXAxis = value;
 
-                // console.log(chosenXAxis)
-
                 // functions here found above csv import
+
                 // updates x scale for new data
                 xLinearScale = xScale(data, chosenXAxis);
 
@@ -294,12 +284,12 @@ d3.csv("assets/data/data.csv").then(function (data, err) {
 
                 // updates circles with new x values
                 circlesGroup = renderXCircles(circlesGroup, xLinearScale, chosenXAxis);
-
-                circlesText = renderXText (circlesText, xLinearScale, chosenXAxis);
+                // updates circle text with new x values
+                circlesText = renderXText(circlesText, xLinearScale, chosenXAxis);
 
                 // updates tooltips with new info
                 circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
-                
+
 
                 // changes classes to change bold text
                 if (chosenXAxis === "poverty") {
@@ -338,7 +328,7 @@ d3.csv("assets/data/data.csv").then(function (data, err) {
             }
         });
 
-    // x axis labels event listener
+    // y-axis labels event listener
     ylabelsGroup.selectAll("text")
         .on("click", function () {
             // get value of selection
@@ -348,19 +338,19 @@ d3.csv("assets/data/data.csv").then(function (data, err) {
                 // replaces chosenXAxis with value
                 chosenYAxis = value;
 
-                // console.log(chosenXAxis)
-
                 // functions here found above csv import
+
                 // updates x scale for new data
                 yLinearScale = yScale(data, chosenYAxis);
 
                 // updates x axis with transition
                 yAxis = renderYAxes(yLinearScale, yAxis);
 
-                // updates circles with new x values
+                // updates circles with new y values
                 circlesGroup = renderYCircles(circlesGroup, yLinearScale, chosenYAxis);
 
-                circlesText = renderYText (circlesText, yLinearScale, chosenYAxis);
+                // updates circle text with new y values
+                circlesText = renderYText(circlesText, yLinearScale, chosenYAxis);
 
                 // updates tooltips with new info
                 circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
